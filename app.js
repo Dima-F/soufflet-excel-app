@@ -8,16 +8,21 @@ const path = require('path');
 
     const bBook = await workbook.xlsx.readFile('book.xlsx');
     const bWorksheet = bBook.getWorksheet(1);
-    const cBook = await workbook.xlsx.readFile('card.xlsx');
-    const cWorksheet1 = cBook.getWorksheet('ik');
-    const cWorksheet2 = cBook.getWorksheet('a');
+    
     const outerIterator = [];
 
-    for(let j=2;j<=413;j++) {
+    for(let j=2;j<=100;j++) {
         outerIterator.push(j);
     }
-
+    
     for(const i of outerIterator) {
+        const cBook = await workbook.xlsx.readFile('card.xlsx');
+        const cWorksheet1 = cBook.getWorksheet('ik');
+        const cWorksheet2 = cBook.getWorksheet('a');
+        const cWorksheet3 = cBook.getWorksheet('n');
+
+        const flag = bWorksheet.getCell(`A${i}`).value.startsWith('1');
+
         const nameCell = bWorksheet.getCell(`C${i}`).value;
         const osnZasCell = bWorksheet.getCell(`A${i}`).value + '-0';
         const invCell = bWorksheet.getCell(`D${i}`).value;
@@ -31,6 +36,7 @@ const path = require('path');
         const posadarespperson = bWorksheet.getCell(`H${i}`).value;
         const PIB = bWorksheet.getCell(`G${i}`).value;
         const company = bWorksheet.getCell(`L${i}`).value;
+        const nakaz = bWorksheet.getCell(`O${i}`).value;
 
         
         cWorksheet1.getCell('B9').value = nameCell;
@@ -60,6 +66,13 @@ const path = require('path');
         cWorksheet2.getCell('B67').value = posadarespperson;
         cWorksheet2.getCell('G67').value = PIB;     
         cWorksheet2.getCell('F72').value = dateCell;
+
+        if(flag) {
+            cWorksheet3.getCell('A7').value = 'НАКАЗ № ' + nakaz;
+        } else {
+            cBook.removeWorksheet(cWorksheet3.id);
+        }
+        
        
         await cBook.xlsx.writeFile(`./output/${osnZasCell}.xlsx`);
     }
